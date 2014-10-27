@@ -65,7 +65,7 @@ $(function() {
 function formatMoney (amount) {
 	amount = amount + "";
     var j = (j = amount.length) > 3 ? j % 3 : 0;
-    return "£" + (j ? amount.substr(0, j) + ',' : "") + amount.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + ',');
+    return "\xA3" + (j ? amount.substr(0, j) + ',' : "") + amount.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + ',');
 }
 
 Handlebars.registerHelper('formatMoney', formatMoney);
