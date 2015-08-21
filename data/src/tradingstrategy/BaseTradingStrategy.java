@@ -18,6 +18,6 @@ public abstract class BaseTradingStrategy {
 	
 	public final DailyOutput finaliseDailyTrade(DailyTrades dailyTrades)
 	{
-		return tradingManager.finalizeTrade(dailyTrades.getTrades().get(0));
+		return tradingManager.finalizeTrade(dailyTrades);
 	}
 }

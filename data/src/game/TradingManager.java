@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dataobjects.DailyInput;
+import dataobjects.DailyTrades;
 import dataobjects.TradeActivity;
 import exceptions.InsufficientFundsException;
 import exceptions.InsufficientSharesException;
@@ -177,6 +178,23 @@ public final class TradingManager {
 			//shouldn't happen
 			throw new RuntimeException();
 		}
+	}
+	
+	public DailyOutput finalizeTrade(DailyTrades trade) {
+		int investedFunds = 0;
+		int availableFunds = 0;
+		int sharesBought = 0;
+		int sharesSold = 0;
+		
+		for (DailyInput input : trade.getTrades()) {
+		    DailyOutput output = finalizeTrade(input);
+		    investedFunds += output.getInvestmentAmount();
+		    availableFunds = output.getAvailableFunds();
+		    sharesBought += output.getTradeActivity().getBuy();
+		    sharesSold += output.getTradeActivity().getSell();
+		}
+		
+		return new DailyOutput(new TradeActivity(sharesBought, sharesSold), availableFunds, investedFunds, trade.getDay());
 	}
 	
 	private DailyOutput makeTrade(DailyInput input, TradeActivity tradeActivity)

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
-import dataobjects.DailyInput;
 import dataobjects.DailyTrades;
 import dataobjects.GameData;
 import dataobjects.GameOutput;
@@ -22,7 +21,7 @@ import exceptions.GameFailureException;
 public class GetResult extends HttpServlet {
 
 	private static final long serialVersionUID = 1;
-	private static final int INITIAL_CAPITAL = 10000;
+	private static final int INITIAL_CAPITAL = 30000;
 	private ObjectMapper mapper = new ObjectMapper();
 
 	@Override

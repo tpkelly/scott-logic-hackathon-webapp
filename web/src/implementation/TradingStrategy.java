@@ -19,7 +19,7 @@ public class TradingStrategy extends BaseTradingStrategy {
 		//use the trading manager to make trades based on input
 		
 		for (DailyInput input : trades.getTrades()) {
-			if (trades.getDay() % 2 == 0) {
+			if (trades.getDay() % 2 == 1) {
 				tradingManager.buyMaxNumberOfShares(input);
 			} else {
 				tradingManager.sellAllShares(input);
