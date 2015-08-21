@@ -1,5 +1,8 @@
 package game;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import dataobjects.DailyInput;
 import dataobjects.TradeActivity;
 import exceptions.InsufficientFundsException;
@@ -9,15 +12,18 @@ public final class TradingManager {
 	
 	private static final int INITIAL_AMOUNT = 10000;
 	private int availableFunds;
-	private int sharesOwned;
+	private Map<String, Integer> sharesOwned;
 	
 	public TradingManager () {
-		availableFunds = INITIAL_AMOUNT;
-		sharesOwned = 0; 
+		this(INITIAL_AMOUNT); 
+	}
+	
+	public TradingManager (int initialFunds) {
+		this(initialFunds, new HashMap<String, Integer>()); 
 	}
 	
 	//for testing
-	TradingManager(int availableFunds, int sharesOwned) {
+	TradingManager(int availableFunds, Map<String, Integer> sharesOwned) {
 		this.availableFunds = availableFunds;
 		this.sharesOwned = sharesOwned;
 	}
@@ -32,15 +38,19 @@ public final class TradingManager {
 	/**
 	 * Gets the number of shares currently owned
 	 */
-	public int getSharesOwned() {
-		return sharesOwned;
+	public int getSharesOwned(String companyName) {
+		if (sharesOwned.containsKey(companyName)) {
+			return sharesOwned.get(companyName);
+		}
+		
+		return 0;
 	}
 	
 	/**
 	 * Get the cash value of the shares currently invested against the close price of the input
 	 */
 	public int getInvestmentAmount(DailyInput input) {
-		return (int) (sharesOwned * input.getClose());
+		return (int) (getSharesOwned(input.getCompany()) * input.getClose());
 	}
 	
 	/**
@@ -141,7 +151,7 @@ public final class TradingManager {
 	 * Sells all currently held shares
 	 */
 	public void sellAllShares(DailyInput input) {
-		TradeActivity activity = new TradeActivity(0, sharesOwned); 
+		TradeActivity activity = new TradeActivity(0, getSharesOwned(input.getCompany())); 
 		try {
 			makeTrade(input, activity);
 		} catch (InsufficientFundsException e) {
@@ -171,12 +181,14 @@ public final class TradingManager {
 	
 	private DailyOutput makeTrade(DailyInput input, TradeActivity tradeActivity)
 			throws InsufficientFundsException, InsufficientSharesException {
-		sharesOwned += tradeActivity.getBuy();
-		sharesOwned -= tradeActivity.getSell();
+		String company = input.getCompany();
+		int companyShares = getSharesOwned(company) + tradeActivity.getBuy() - tradeActivity.getSell();
 		
-		if (sharesOwned < 0) {
+		if (companyShares < 0) {
 			throw new InsufficientSharesException("You have insufficent shares to sell");
 		}
+
+		sharesOwned.put(company, companyShares);
 		
 		availableFunds += tradeActivity.getSell() * input.getClose();
 		availableFunds -= tradeActivity.getBuy() * input.getClose();
@@ -185,7 +197,7 @@ public final class TradingManager {
 			throw new InsufficientFundsException("You have insufficient funds to make this trade");
 		}
 		
-		return new DailyOutput(tradeActivity, availableFunds, (int)(sharesOwned * input.getClose()), input.getDay());
+		return new DailyOutput(tradeActivity, availableFunds, (int)(companyShares * input.getClose()), input.getDay());
 		
 	}
 }

@@ -1,5 +1,8 @@
 package game;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 
 import org.junit.Before;
@@ -14,12 +17,13 @@ public class TradingManagerTest {
 
 	private TradingManager manager;
 	private DailyInput input;
+	private final String TEST_COMPANY = "Test company";
 	
 	@Before
 	public void setup() {
 		manager = new TradingManager();
 		//close price of 2.0
-		input = new DailyInput("Test company", 1, 1.0, 2.0, 3.0, 0.0);
+		input = new DailyInput(TEST_COMPANY, 1, 1.0, 2.0, 3.0, 0.0);
 	}
 	
 	@Test
@@ -70,7 +74,10 @@ public class TradingManagerTest {
 	
 	@Test
 	public void test_sell_shares_of_value_increases_available_funds_and_decreases_shares_held() throws InsufficientSharesException  {
-		TradingManager manager = new TradingManager(0, 10000); //start with 10000 shares (worth £20,000)
+		Map<String, Integer> initialFunds = new HashMap<String, Integer>();
+		initialFunds.put(TEST_COMPANY, 10000);
+		
+		TradingManager manager = new TradingManager(0, initialFunds); //start with 10000 shares (worth £20,000)
 		manager.sellSharesOfValue(input , 5000);
 		DailyOutput out = manager.finalizeTrade(input);
 		DailyOutput expected = new DailyOutput(new TradeActivity(0, 2500), 5000, 15000, 1);
@@ -80,7 +87,10 @@ public class TradingManagerTest {
 	
 	@Test (expected = InsufficientSharesException.class)
 	public void test_sell_shares_of_value_with_insufficient_shares_throws_exception() throws InsufficientSharesException  {
-		TradingManager manager = new TradingManager(0, 10000); //start with 10000 shares (worth £20,000)
+		Map<String, Integer> initialFunds = new HashMap<String, Integer>();
+		initialFunds.put(TEST_COMPANY, 10000);
+		
+		TradingManager manager = new TradingManager(0, initialFunds); //start with 10000 shares (worth £20,000)
 		manager.sellSharesOfValue(input , 20002);
 	}
 	
@@ -91,7 +101,10 @@ public class TradingManagerTest {
 	
 	@Test
 	public void test_sell_number_of_shares_increases_available_funds_and_decreases_shares_held() throws InsufficientSharesException  {
-		TradingManager manager = new TradingManager(0, 10000); //start with 10000 shares (worth £20,000)
+		Map<String, Integer> initialFunds = new HashMap<String, Integer>();
+		initialFunds.put(TEST_COMPANY, 10000);
+		
+		TradingManager manager = new TradingManager(0, initialFunds); //start with 10000 shares (worth £20,000)
 		manager.sellNumberOfShares(input, 2500);
 		DailyOutput out = manager.finalizeTrade(input);
 		DailyOutput expected = new DailyOutput(new TradeActivity(0, 2500), 5000, 15000, 1);
@@ -101,19 +114,28 @@ public class TradingManagerTest {
 	
 	@Test (expected = InsufficientSharesException.class)
 	public void test_sell_number_of_shares_with_insufficient_shares_throws_exception() throws InsufficientSharesException  {
-		TradingManager manager = new TradingManager(0, 10000); //start with 10000 shares (worth £20,000)
+		Map<String, Integer> initialFunds = new HashMap<String, Integer>();
+		initialFunds.put(TEST_COMPANY, 10000);
+		
+		TradingManager manager = new TradingManager(0, initialFunds); //start with 10000 shares (worth £20,000)
 		manager.sellNumberOfShares(input, 10001);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void test_sell_number_of_shares_with_negative_number_throws_exception() throws InsufficientSharesException {
-		TradingManager manager = new TradingManager(0, 10000); //start with 10000 shares (worth £20,000)
+		Map<String, Integer> initialFunds = new HashMap<String, Integer>();
+		initialFunds.put(TEST_COMPANY, 10000);
+		
+		TradingManager manager = new TradingManager(0, initialFunds); //start with 10000 shares (worth £20,000)
 		manager.sellNumberOfShares(input, -10);
 	}
 	
 	@Test
 	public void test_sell_all_shares_reduces_shares_to_zero() {
-		TradingManager manager = new TradingManager(0, 10000); //start with 10000 shares (worth £20,000)
+		Map<String, Integer> initialFunds = new HashMap<String, Integer>();
+		initialFunds.put(TEST_COMPANY, 10000);
+		
+		TradingManager manager = new TradingManager(0, initialFunds); //start with 10000 shares (worth £20,000)
 		manager.sellAllShares(input);
 		DailyOutput out = manager.finalizeTrade(input);
 		DailyOutput expected = new DailyOutput(new TradeActivity(0, 10000), 20000, 0, 1);
@@ -134,7 +156,7 @@ public class TradingManagerTest {
 		DailyOutput expected = new DailyOutput(new TradeActivity(5000, 0), 0, 10000, 1);
 		Assert.assertEquals(expected.getInvestmentAmount(), out.getInvestmentAmount());
 		
-		DailyInput inputDay2 = new DailyInput("Test Company", 2, 2.0, 4.0, 5.0, 1.0);
+		DailyInput inputDay2 = new DailyInput(TEST_COMPANY, 2, 2.0, 4.0, 5.0, 1.0);
 		DailyOutput outDay2 = manager.finalizeTrade(inputDay2);
 		DailyOutput expectedDay2 = new DailyOutput(new TradeActivity(0, 0), 0, 20000, 2);
 		Assert.assertEquals(expectedDay2.getInvestmentAmount(), outDay2.getInvestmentAmount());

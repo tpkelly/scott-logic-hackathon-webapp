@@ -28,7 +28,7 @@ public class GetResult extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		TradingManager tradingManager = new TradingManager(INITIAL_CAPITAL, 0);
+		TradingManager tradingManager = new TradingManager(INITIAL_CAPITAL);
 		TradingStrategy strategy = new TradingStrategy(tradingManager);
 
 		GameData gameData;
