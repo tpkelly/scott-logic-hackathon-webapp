@@ -4,7 +4,7 @@ import tradingstrategy.BaseTradingStrategy;
 
 import java.util.LinkedList;
 
-import dataobjects.DailyInput;
+import dataobjects.DailyTrades;
 import dataobjects.GameData;
 import dataobjects.GameOutput;
 import exceptions.GameFailureException;
@@ -23,13 +23,16 @@ public class Game {
 	public GameOutput getResult() throws GameFailureException {
 		LinkedList<DailyOutput> dailyOutputs = new LinkedList<DailyOutput>();
 		
-		for(DailyInput input : gameData.getInputs()) {
+		for(DailyTrades input : gameData.getInputs()) {
+			int day = input.getDay();
+			
 			try {
-				dailyOutputs.add(strategy.makeDailyTrade(input));
+				strategy.makeDailyTrade(input);
+				dailyOutputs.add(strategy.finaliseDailyTrade(input));
 			} catch (InsufficientFundsException e) {
-				throw new GameFailureException("You tried to make a trade but had insufficient funds. This occurred on day " + input.getDay(), e);
+				throw new GameFailureException("You tried to make a trade but had insufficient funds. This occurred on day " + day, e);
 			} catch (InsufficientSharesException e) {
-				throw new GameFailureException("You tried to make a trade but had insufficient shares. This occurred on day " + input.getDay(), e);
+				throw new GameFailureException("You tried to make a trade but had insufficient shares. This occurred on day " + day, e);
 			}
 		}
 		DailyOutput last = dailyOutputs.getLast();

@@ -3,19 +3,19 @@ package dataobjects;
 import java.util.List;
 
 public class GameData {
-	private String name;
-	private List<DailyInput> inputs;
+	private List<String> names;
+	private List<DailyTrades> inputs;
 	
-	public GameData(String companyName, List<DailyInput> inputs) {
-		this.name = companyName;
+	public GameData(List<String> companyNames, List<DailyTrades> inputs) {
+		this.names = companyNames;
 		this.inputs = inputs;
 	}
 	
-	public String getName() {
-		return this.name;
+	public List<String> getNames() {
+		return this.names;
 	}
 	
-	public List<DailyInput> getInputs() {
+	public List<DailyTrades> getInputs() {
 		return this.inputs;
 	}
 	

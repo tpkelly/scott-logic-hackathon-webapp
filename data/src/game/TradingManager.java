@@ -47,7 +47,7 @@ public final class TradingManager {
 	 * Buys a number of shares worth the amount given based on the close price of the input
 	 * @throws InsufficientFundsException if there are less funds available than the given value
 	 */
-	public DailyOutput buySharesOfValue(DailyInput input, int value) throws InsufficientFundsException {
+	public void buySharesOfValue(DailyInput input, int value) throws InsufficientFundsException {
 		if (value < 0) {
 			throw new IllegalArgumentException("Negative number given");
 		}
@@ -55,7 +55,7 @@ public final class TradingManager {
 		int sharesToBuy = (int)(value / input.getClose());
 		TradeActivity activity = new TradeActivity(sharesToBuy, 0);
 		try {
-			return makeTrade(input, activity);
+			makeTrade(input, activity);
 		} catch (InsufficientSharesException e) {
 			//shouldn't happen
 			throw new RuntimeException();
@@ -66,14 +66,14 @@ public final class TradingManager {
 	 * Buys the given number of shares at the close price of the input
 	 * @throws InsufficientFundsException if there are insufficient funds to buy the number of shares requested
 	 */
-	public DailyOutput buyNumberOfShares(DailyInput input, int totalShares) throws InsufficientFundsException {
+	public void buyNumberOfShares(DailyInput input, int totalShares) throws InsufficientFundsException {
 		if (totalShares < 0) {
 			throw new IllegalArgumentException("Negative number given");
 		}
 		
 		TradeActivity activity = new TradeActivity(totalShares, 0);
 		try {
-			return makeTrade(input, activity);
+			makeTrade(input, activity);
 		} catch (InsufficientSharesException e) {
 			//shouldn't happen
 			throw new RuntimeException();
@@ -84,12 +84,12 @@ public final class TradingManager {
 	 * Uses all of the available funds to buy as many shares as possible at the close price of the input.
 	 * Note that after this trade, available balance may not be zero as the close price may not be exactly divisible by the available funds
 	 */
-	public DailyOutput buyMaxNumberOfShares(DailyInput input) {
+	public void buyMaxNumberOfShares(DailyInput input) {
 		//TODO rounding errors?
 		int sharesToBuy = (int)(availableFunds / input.getClose());
 		TradeActivity activity = new TradeActivity(sharesToBuy, 0);
 		try {
-			return makeTrade(input, activity);
+			makeTrade(input, activity);
 		} catch (InsufficientFundsException e) {
 			//shouldn't happen
 			throw new RuntimeException();
@@ -104,7 +104,7 @@ public final class TradingManager {
 	 * Note that the given value is an approximate as the close price may not be exactly divisible
 	 * @throws InsufficientSharesException if there are insufficient shares to the value of the given input
 	 */
-	public DailyOutput sellSharesOfValue(DailyInput input, int value) throws InsufficientSharesException {
+	public void sellSharesOfValue(DailyInput input, int value) throws InsufficientSharesException {
 		if (value < 0) {
 			throw new IllegalArgumentException("Negative number given");
 		}
@@ -112,7 +112,7 @@ public final class TradingManager {
 		int sharesToSell = (int)(value / input.getClose());
 		TradeActivity activity = new TradeActivity(0, sharesToSell);
 		try {
-			return makeTrade(input, activity);
+			makeTrade(input, activity);
 		} catch (InsufficientFundsException e) {
 			//shouldn't happen
 			throw new RuntimeException();
@@ -123,14 +123,14 @@ public final class TradingManager {
 	 * Sells the given number of shares at the close price of the input
 	 * @throws InsufficientSharesException if there are insufficient shares currently held to sell the number of shares requested
 	 */
-	public DailyOutput sellNumberOfShares(DailyInput input, int totalShares) throws InsufficientSharesException {
+	public void sellNumberOfShares(DailyInput input, int totalShares) throws InsufficientSharesException {
 		if (totalShares < 0) {
 			throw new IllegalArgumentException("Negative number given");
 		}
 		
 		TradeActivity activity = new TradeActivity(0, totalShares);
 		try {
-			return makeTrade(input, activity);
+			makeTrade(input, activity);
 		} catch (InsufficientFundsException e) {
 			//shouldn't happen
 			throw new RuntimeException();
@@ -140,10 +140,10 @@ public final class TradingManager {
 	/**
 	 * Sells all currently held shares
 	 */
-	public DailyOutput sellAllShares(DailyInput input) {
+	public void sellAllShares(DailyInput input) {
 		TradeActivity activity = new TradeActivity(0, sharesOwned); 
 		try {
-			return makeTrade(input, activity);
+			makeTrade(input, activity);
 		} catch (InsufficientFundsException e) {
 			//shouldn't happen
 			throw new RuntimeException();
@@ -154,9 +154,9 @@ public final class TradingManager {
 	}
 	
 	/**
-	 * Complete no trade activity
+	 * Complete trade activity
 	 */
-	public DailyOutput doNothing(DailyInput input) {
+	public DailyOutput finalizeTrade(DailyInput input) {
 		TradeActivity activity = new TradeActivity(0, 0);
 		try {
 			return makeTrade(input, activity);

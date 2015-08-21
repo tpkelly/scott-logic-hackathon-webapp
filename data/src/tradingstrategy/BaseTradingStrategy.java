@@ -2,7 +2,7 @@ package tradingstrategy;
 
 import game.DailyOutput;
 import game.TradingManager;
-import dataobjects.DailyInput;
+import dataobjects.DailyTrades;
 import exceptions.InsufficientFundsException;
 import exceptions.InsufficientSharesException;
 
@@ -14,5 +14,10 @@ public abstract class BaseTradingStrategy {
 		tradingManager = new TradingManager();
 	}
 
-	public abstract DailyOutput makeDailyTrade(DailyInput input) throws InsufficientFundsException, InsufficientSharesException;
+	public abstract void makeDailyTrade(DailyTrades dailyTrades) throws InsufficientFundsException, InsufficientSharesException;
+	
+	public final DailyOutput finaliseDailyTrade(DailyTrades dailyTrades)
+	{
+		return tradingManager.finalizeTrade(dailyTrades.getTrades().get(0));
+	}
 }

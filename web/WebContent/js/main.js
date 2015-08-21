@@ -1,31 +1,23 @@
 $(function() {
 	var self = this;
-	
-    var companies = ["Amazon", "Yahoo", "Tesco"];
-    
+   
     var source   = $("#template").html();
     var template = Handlebars.compile(source);
-    var total = 0;
     
-    function getData(company) {
-    	$.getJSON("getResult", {company: company})
+    function getData() {
+    	$.getJSON("getResult")
     		.done(function(data) {
     			$("#content").append(template(data));
     			
     			//add chart
     			var chart = new self.chartData();
     			chart.series = data.chartData;
-    			$('#chart' + company).highcharts(chart);
-    			
-    			total += data.output.totalFunds;
-    			$('footer h1').html("Total: " + formatMoney(total));
+    			$('#chart').highcharts(chart);
 	    	}, this);
     };
     
     
-    for (var i = 0; i < companies.length; i++) {
-    	getData(companies[i]);
-    };
+    getData();
     
     
     this.chartData = function() {
@@ -36,12 +28,14 @@ $(function() {
             },
             yAxis: [{
 	            	title: {
-	                    text: 'Close price'
+	                    text: 'Close price',
 	                },
+                    min: 0
                 }, {
 	                title: {
-	                    text: 'Investments'
+	                    text: 'Investments',
 	                },
+                    min: 0,
 	                opposite: true
             }],
             tooltip: {

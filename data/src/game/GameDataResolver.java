@@ -4,16 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import dataobjects.DailyInput;
+import dataobjects.DailyTrades;
 import dataobjects.GameData;
 
 
@@ -24,56 +23,69 @@ public class GameDataResolver {
 	public static final List<String> COMPANIES = Collections.unmodifiableList(
 			Arrays.asList("Amazon", "Yahoo", "Tesco"));
 	
-	private final Map<String, GameData> data = new HashMap<String, GameData>();
+	private GameData data;
 
 
 	private GameDataResolver() {
-		for (String company : COMPANIES) {
-			try {
-				data.put(company, createGameData(company));
-			} catch (JsonParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			data = createGameData(COMPANIES);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
 	}
 	
-	private GameData createGameData(String company) throws JsonParseException, IOException {
+	private GameData createGameData(List<String> companies) throws JsonParseException, IOException {
 		
-		InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("data/" + company + ".json");
+		List<List<DailyInput>> inputs = new LinkedList<List<DailyInput>>();
 		
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode jsonNode = mapper.readTree(resourceAsStream);
-		
-		JsonNode results = jsonNode.get("query").get("results").get("quote");
-		
-		List<DailyInput> inputs = new LinkedList<DailyInput>();
-		for (int i = 0; i < results.size(); i++) {
+		for (String company : companies)
+		{
+			InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("data/" + company + ".json");
 			
-			JsonNode result = results.get(i);
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode jsonNode = mapper.readTree(resourceAsStream);
 			
-			double open = Double.parseDouble(result.get("Open").getTextValue());
-			double close = Double.parseDouble(result.get("Close").getTextValue());
-			double high = Double.parseDouble(result.get("High").getTextValue());
-			double low = Double.parseDouble(result.get("Low").getTextValue());
+			JsonNode results = jsonNode.get("query").get("results").get("quote");
 			
-			int day = i + 1;
-			inputs.add(new DailyInput(day, results.size() - day, open, close, high, low));
+			List<DailyInput> companyInputs = new LinkedList<DailyInput>();
+			for (int i = 0; i < results.size(); i++) {
+				
+				JsonNode result = results.get(i);
+				
+				double open = Double.parseDouble(result.get("Open").getTextValue());
+				double close = Double.parseDouble(result.get("Close").getTextValue());
+				double high = Double.parseDouble(result.get("High").getTextValue());
+				double low = Double.parseDouble(result.get("Low").getTextValue());
+				
+				companyInputs.add(new DailyInput(company, i+1, open, close, high, low));
+			}
+			
+			inputs.add(companyInputs);
 		}
 		
-		return new GameData(company, inputs);
+		// Map to daily trades
+		List<DailyTrades> dailyTrades = new LinkedList<DailyTrades>();
+		int totalDays = inputs.get(0).size();
+		
+		for (int i = 0; i < totalDays; i++)
+		{
+			List<DailyInput> dailyInputs = new LinkedList<DailyInput>();
+			for (List<DailyInput> companyInput : inputs) {
+				dailyInputs.add(companyInput.get(i));
+			}
+			
+			dailyTrades.add(new DailyTrades(dailyInputs, i+1, totalDays - i));
+		}
+		
+		return new GameData(companies, dailyTrades);
 	}
 
-	public GameData getGameData(String company) {
-		GameData gameData = data.get(company);
-		if (gameData == null) {
-			throw new IllegalArgumentException("supplied company is invalid");
-		}
-		return gameData;
+	public GameData getGameData() {
+		return data;
 	}
 	
 	public static GameDataResolver getInstance() {

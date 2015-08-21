@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import dataobjects.DailyInput;
+import dataobjects.DailyTrades;
 import dataobjects.GameData;
 import dataobjects.GameOutput;
 import exceptions.GameFailureException;
@@ -30,11 +31,9 @@ public class GetResult extends HttpServlet {
 		TradingManager tradingManager = new TradingManager(INITIAL_CAPITAL, 0);
 		TradingStrategy strategy = new TradingStrategy(tradingManager);
 
-		String company = req.getParameter("company");
-
 		GameData gameData;
 		try {
-			gameData = GameDataResolver.getInstance().getGameData(company);
+			gameData = GameDataResolver.getInstance().getGameData();
 		} catch (IllegalArgumentException e) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Supplied company is invalid");
 			return;
@@ -53,21 +52,24 @@ public class GetResult extends HttpServlet {
 		Result toReturn = new Result();
 		toReturn.output = result;
 		toReturn.chartData = buildChartData(result, gameData.getInputs());
-		toReturn.company = company;
 
 		mapper.writeValue(resp.getOutputStream(), toReturn);
 		resp.getOutputStream().close();
 	}
 
-	private List<ChartSeries> buildChartData(GameOutput result, List<DailyInput> inputs) {
+	private List<ChartSeries> buildChartData(GameOutput result, List<DailyTrades> inputs) {
 		List<ChartSeries> chartData = new LinkedList<ChartSeries>();
 
-		ChartSeries in = new ChartSeries();
-		in.name = "Company Close Price";
-		in.data = new LinkedList<Double>();
-		in.yAxis = 0;
-		for (DailyInput di : inputs) {
-			in.data.add(di.getClose());
+		for (int i = 0; i < inputs.get(0).getTrades().size(); i++) {
+			ChartSeries in = new ChartSeries();
+			in.name = inputs.get(0).getTrades().get(i).getCompany() +  " Close Price";
+			in.data = new LinkedList<Double>();
+			in.yAxis = 0;
+			for (DailyTrades dt : inputs) {
+				in.data.add(dt.getTrades().get(i).getClose());
+			}
+			
+			chartData.add(in);
 		}
 
 		ChartSeries out = new ChartSeries();
@@ -78,7 +80,6 @@ public class GetResult extends HttpServlet {
 			out.data.add((double) (dailyOut.getAvailableFunds() + dailyOut.getInvestmentAmount()));
 		}
 
-		chartData.add(in);
 		chartData.add(out);
 
 		return chartData;
