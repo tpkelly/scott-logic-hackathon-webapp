@@ -15,9 +15,9 @@ public class Game {
 	private BaseTradingStrategy strategy;
 	private GameData gameData;
 	
-	public Game(BaseTradingStrategy strategy, GameData data) {
+	public Game(BaseTradingStrategy strategy) {
 		this.strategy = strategy;
-		this.gameData = data;
+		this.gameData = GameDataResolver.getInstance().getGameData();
 	}
 	
 	public GameOutput getResult() throws GameFailureException {

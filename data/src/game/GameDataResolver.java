@@ -16,7 +16,7 @@ import dataobjects.DailyTrades;
 import dataobjects.GameData;
 
 
-public class GameDataResolver {
+class GameDataResolver {
 
 	private static GameDataResolver instance;
 	private static Object LOCK = new Object();
@@ -84,11 +84,11 @@ public class GameDataResolver {
 		return new GameData(companies, dailyTrades);
 	}
 
-	public GameData getGameData() {
+	GameData getGameData() {
 		return data;
 	}
 	
-	public static GameDataResolver getInstance() {
+	static GameDataResolver getInstance() {
 		synchronized(LOCK) {
 			if (instance == null) {
 				instance = new GameDataResolver();
