@@ -19,12 +19,27 @@ public final class DailyOutput {
 	public TradeActivity getTradeActivity() {
 		return tradeActivity;
 	}
+	
+	/**
+	 * The remaining money available to buy shares with
+	 * @return The remaining money available to buy shares with
+	 */
 	public int getAvailableFunds() {
 		return availableFunds;
 	}
+	
+	/**
+	 * The value of all currently owned shares if they were to be sold immediately
+	 * @return The value of all currently owned shares
+	 */
 	public int getInvestmentAmount() {
 		return investmentAmount;
 	}
+	
+	/**
+	 * The number of days since trading began. The first day is Day 1.
+	 * @return The number of days since trading began
+	 */
 	public int getDay() {
 		return day;
 	}

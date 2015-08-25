@@ -183,10 +183,7 @@ public final class TradingManager {
 		}
 	}
 	
-	/**
-	 * Complete trade activity
-	 */
-	public DailyOutput finalizeTrade(DailyInput input) {
+	DailyOutput finalizeTrade(DailyInput input) {
 		TradeActivity activity = new TradeActivity(0, 0);
 		try {
 			return makeTrade(input, activity);

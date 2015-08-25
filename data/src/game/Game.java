@@ -15,11 +15,20 @@ public class Game {
 	private BaseTradingStrategy strategy;
 	private GameData gameData;
 	
+	/**
+	 * Simulate a year of trading with a given trading strategy.
+	 * @param strategy The strategy to use for buying and selling.
+	 */
 	public Game(BaseTradingStrategy strategy) {
 		this.strategy = strategy;
 		this.gameData = GameDataResolver.getInstance().getGameData();
 	}
 	
+	/** 
+	 * The final result of trading for the year.
+	 * @return The fund totals and trading data for the year.
+	 * @throws GameFailureException An invalid trade was attempted and failed.
+	 */
 	public GameOutput getResult() throws GameFailureException {
 		LinkedList<DailyOutput> dailyOutputs = new LinkedList<DailyOutput>();
 		

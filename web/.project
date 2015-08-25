@@ -3,7 +3,6 @@
 	<name>hackathon-webapp</name>
 	<comment></comment>
 	<projects>
-		<project>ShareTrading</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
