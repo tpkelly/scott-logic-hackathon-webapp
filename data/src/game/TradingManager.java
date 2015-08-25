@@ -5,6 +5,7 @@ import java.util.Map;
 
 import dataobjects.DailyInput;
 import dataobjects.DailyTrades;
+import dataobjects.GameData;
 import dataobjects.TradeActivity;
 import exceptions.InsufficientFundsException;
 import exceptions.InsufficientSharesException;
@@ -19,7 +20,7 @@ public final class TradingManager {
 		this(INITIAL_AMOUNT); 
 	}
 	
-	public TradingManager (int initialFunds) {
+	TradingManager (int initialFunds) {
 		this(initialFunds, new HashMap<String, Integer>()); 
 	}
 	
@@ -29,6 +30,24 @@ public final class TradingManager {
 		this.sharesOwned = sharesOwned;
 	}
 
+	private void verifyInput(DailyInput input) {
+		GameData data = GameDataResolver.getInstance().getGameData();
+		DailyTrades trades = data.getInputs().get(input.getDay() - 1);
+		
+		for (DailyInput trade : trades.getTrades()) {
+			if (!trade.getCompany().equals(input.getCompany())) continue;
+			
+			// Check the close price has not been modified
+			if (trade.getClose() != input.getClose())
+				throw new IllegalArgumentException("Close price was modified from " + trade.getClose() + " -> " + input.getClose());
+			
+			return; // Found the valid input
+		}
+		
+		// Could not find a company matching the name
+  	    throw new IllegalArgumentException("Could not find the company: " + input.getCompany());
+	}
+	
 	/**
 	 * Gets the amount of cash available
 	 */
@@ -199,6 +218,9 @@ public final class TradingManager {
 	
 	private DailyOutput makeTrade(DailyInput input, TradeActivity tradeActivity)
 			throws InsufficientFundsException, InsufficientSharesException {
+		// Check the input was not modified
+		verifyInput(input);
+		
 		String company = input.getCompany();
 		int companyShares = getSharesOwned(company) + tradeActivity.getBuy() - tradeActivity.getSell();
 		
