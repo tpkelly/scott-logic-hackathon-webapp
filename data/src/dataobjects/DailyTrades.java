@@ -2,6 +2,11 @@ package dataobjects;
 
 import java.util.List;
 
+/**
+ * Details of the stock prices for all companies on a single day.
+ * @author tkelly
+ *
+ */
 public class DailyTrades {
 
 	private List<DailyInput> dailyTrades;

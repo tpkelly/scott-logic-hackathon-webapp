@@ -1,5 +1,11 @@
 package dataobjects;
 
+/** 
+ * Stock price details for a single company on a single day. Includes the Open, High, Low, and Close data.
+ * All trading is done based on the "close" price of the stock.
+ * @author tkelly
+ *
+ */
 public class DailyInput {
 	
 	private String companyName;
